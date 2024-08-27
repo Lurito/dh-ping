@@ -139,14 +139,14 @@ fn send_and_receive(destination: &str, language: &str) {
             io::stdout().flush().unwrap();
 
             match language {
-                "zh" => eprintln!("数据发送失败: {}", e),
-                _ => eprintln!("Failed to send data: {}", e),
+                "zh" => eprint!("数据发送失败: {}", e),
+                _ => eprint!("Failed to send data: {}", e),
             }
 
             stdout.reset().unwrap();
             io::stdout().flush().unwrap();
 
-            std::process::exit(1);
+            return;
         }
     }
 
