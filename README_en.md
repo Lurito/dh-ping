@@ -36,7 +36,7 @@ DH-Ping sends a Dread Hunger UDP handshake packet to the specified URI. If a res
 
 DH-Ping has two modes: command-line mode and interactive mode. Entering `<IP:port>` as a command-line argument is command-line mode, and not entering it will enter interactive mode.
 
-DH-Ping detects the system language (detection methods include the `LANG` and `LC_ALL` environment variables, and the Win32 `GetUserDefaultUILanguage` API) and automatically switches the display language.
+DH-Ping detects the system language (detection methods include the `LANG` and `LC_ALL` environment variables, and the Win32 `GetUserDefaultUILanguage` API) and automatically switches the display language (supports Chinese and English).
 
 ## Open Source License
 

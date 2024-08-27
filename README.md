@@ -34,7 +34,7 @@ DH-Ping 会向指定的 URI 发送 Dread Hunger UDP 握手包。若能得到服�
 
 DH-Ping 有两种模式：命令行模式和交互性模式。输入 `<IP:端口>` 作为命令行参数即为命令行模式，不输入则会进入交互性模式。
 
-DH-Ping 会检测系统语言（检测方式包括 `LANG` 和 `LC_ALL` 环境变量，和 Win32 `GetUserDefaultUILanguage` API），并自动切换显示语言。
+DH-Ping 会检测系统语言（检测方式包括 `LANG` 和 `LC_ALL` 环境变量，和 Win32 `GetUserDefaultUILanguage` API），并自动切换显示语言（支持中、英文）。
 
 ## 开源许可
 
