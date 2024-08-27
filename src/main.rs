@@ -313,6 +313,7 @@ fn main() {
         }
 
         send_and_receive(destination, language);
+        println!();
     } else if args.len() == 1 {
         repl_mode(language);
     } else {
