@@ -17,7 +17,7 @@ fn detect_language() -> &'static str {
 
     if lang.starts_with("zh") || lc_all.starts_with("zh") {
         "zh"
-    } else if lang.len() > 0 || lc_all.len() > 0 {
+    } else if !lang.is_empty() || !lc_all.is_empty() {
         "en"
     } else {
         #[cfg(target_os = "windows")]
@@ -127,7 +127,7 @@ fn send_and_receive(destination: &str, language: &str) {
         }
     };
 
-    match socket.send_to(&payload, &destination) {
+    match socket.send_to(&payload, destination) {
         Ok(_) => {
             match language {
                 "zh" => println!("数据已发往 {}", destination),
@@ -215,12 +215,10 @@ fn repl_mode(language: &str) {
         stdout.reset().unwrap();
         io::stdout().flush().unwrap();
         std::process::exit(0);
-    }).expect(
-        match language {
+    }).unwrap_or_else(|_| { panic!("{}", match language {
             "zh" => "初始化 SIGINT 信号处理逻辑失败，程序将退出。",
             _ => "Failed to initialize SIGINT signal processing logic, the program will exit.",
-        }
-    );
+        }.to_string()) });
 
     // Title hint
     print_version(language);
