@@ -1,7 +1,7 @@
 [package]
 name = "dh-ping"
 authors = ["Ayrzo"]
-version = "1.0.1-0.dev.0"
+version = "1.0.1-0.dev.1"
 edition = "2021"
 description = "A command-line tool of checking Dread Hunger server connectivity"
 repository = "https://github.com/Lurito/dh-ping/"

@@ -69,7 +69,7 @@ fn print_help(language: &str) {
 
 fn print_version(language: &str) {
     let project_repo = built_info::PKG_REPOSITORY;
-    println!("Dread Hunger Ping Tool - v{} (2024-08-27)", built_info::PKG_VERSION);
+    println!("Dread Hunger Ping Tool - v{} (2024-09-10)", built_info::PKG_VERSION);
     match language {
         "zh" => {
             println!("爱佐 (c) 2024，根据 GNU 宽通用公共许可证 (LGPL) 授权。");
@@ -130,7 +130,7 @@ fn send_and_receive(destination: &str, language: &str) {
     match socket.send_to(&payload, &destination) {
         Ok(_) => {
             match language {
-                "zh" => println!("数据已发送到 {}", destination),
+                "zh" => println!("数据已发往 {}", destination),
                 _ => println!("Data sent to {}", destination),
             }
         }
