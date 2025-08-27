@@ -14,6 +14,9 @@ use rustyline::{
 #[cfg(target_os = "windows")]
 use winapi::um::winnls::GetUserDefaultUILanguage;
 
+#[cfg(target_os = "windows")]
+use winapi::um::wincon::SetConsoleTitleW;
+
 pub mod built_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
 }
@@ -36,6 +39,21 @@ fn detect_language() -> &'static str {
             }
         }
         "en"
+    }
+}
+
+#[cfg(target_os = "windows")]
+fn set_console_title(language: &str) {
+    let title = match language {
+        "zh" => "DH-Ping - Dread Hunger 服务器连通性测试工具",
+        _ => "DH-Ping - Dread Hunger Server Connectivity Tool",
+    };
+
+    // Convert to UTF-16 for SetConsoleTitleW
+    let wide_title: Vec<u16> = title.encode_utf16().chain(std::iter::once(0)).collect();
+
+    unsafe {
+        SetConsoleTitleW(wide_title.as_ptr());
     }
 }
 
@@ -321,6 +339,10 @@ fn repl_mode(language: &str) {
 
 fn main() {
     let language = detect_language();
+
+    #[cfg(target_os = "windows")]
+    set_console_title(language);
+
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 2 {
