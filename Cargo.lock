@@ -56,7 +56,7 @@ dependencies = [
 
 [[package]]
 name = "dh-ping"
-version = "1.0.1-0.dev.1"
+version = "1.0.1-0.dev.2"
 dependencies = [
  "built",
  "ctrlc",
