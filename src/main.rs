@@ -276,12 +276,10 @@ fn repl_mode(language: &str) {
         "zh" => {
             println!("输入 IP:端口 查询 Dread Hunger 服务器端口连通性，例如：127.0.0.1:7777");
             println!("输入 'exit' 退出");
-            println!("提示：可使用上下键切换历史记录");
         },
         _ => {
             println!("Enter IP:port to check connectivity of Dread Hunger server, e.g., 127.0.0.1:7777");
             println!("Enter 'exit' to quit");
-            println!("Tip: Use up/down arrow keys to navigate history");
         },
     }
     println!();
