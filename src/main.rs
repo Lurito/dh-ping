@@ -3,7 +3,13 @@ use std::net::UdpSocket;
 use std::time::Duration;
 use std::io::{self, Write};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
-use rustyline;
+use rustyline::{
+    Helper,
+    hint::Hinter,
+    completion::Completer,
+    highlight::Highlighter,
+    validate::Validator,
+};
 
 #[cfg(target_os = "windows")]
 use winapi::um::winnls::GetUserDefaultUILanguage;
@@ -210,7 +216,24 @@ fn send_and_receive(destination: &str, language: &str) {
 
 fn repl_mode(language: &str) {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
-    let mut rl = rustyline::Editor::<(), rustyline::history::DefaultHistory>::new().unwrap();
+
+    // Initialize rustyline helper for correctly set user input to yellow
+    struct InputHelper;
+    impl Helper for InputHelper {}
+    impl Completer for InputHelper { type Candidate = String; }
+    impl Hinter for InputHelper { type Hint = String; }
+    impl Validator for InputHelper {}
+    impl Highlighter for InputHelper {
+        fn highlight<'l>(&self, line: &'l str, _pos: usize) -> std::borrow::Cow<'l, str> {
+            format!("\x1b[33m{}\x1b[0m", line).into()
+        }
+        fn highlight_char(&self, _line: &str, _pos: usize, _forced: bool) -> bool {
+            true
+        }
+    }
+
+    let mut rl = rustyline::Editor::<InputHelper, rustyline::history::DefaultHistory>::new().unwrap();
+    rl.set_helper(Some(InputHelper));
 
     // Set Ctrl + C/D handler
     ctrlc::set_handler(move || {
@@ -241,9 +264,10 @@ fn repl_mode(language: &str) {
     // Main logic
     loop {
         let prompt = "DH-Ping > ";
-        stdout.set_color(ColorSpec::new().set_fg(Some(Color::Yellow))).unwrap();
-        let readline = rl.readline(prompt);
+        let readline = rl.readline(prompt); // User input is set to yellow in helper
+
         stdout.reset().unwrap();
+        io::stdout().flush().unwrap();
         
         match readline {
             Ok(line) => {
