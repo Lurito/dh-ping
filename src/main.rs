@@ -48,18 +48,13 @@ fn set_console_title(language: &str) {
         "zh" => "DH-Ping - Dread Hunger 服务器连通性测试工具",
         _ => "DH-Ping - Dread Hunger Server Connectivity Tool",
     };
-    
+
     // Convert to UTF-16 for SetConsoleTitleW
     let wide_title: Vec<u16> = title.encode_utf16().chain(std::iter::once(0)).collect();
-    
+
     unsafe {
         SetConsoleTitleW(wide_title.as_ptr());
     }
-}
-
-#[cfg(not(target_os = "windows"))]
-fn set_console_title(_language: &str) {
-    // No-op on non-Windows platforms
 }
 
 fn print_help(language: &str) {
@@ -344,10 +339,10 @@ fn repl_mode(language: &str) {
 
 fn main() {
     let language = detect_language();
-    
-    // Set console title on Windows
+
+    #[cfg(target_os = "windows")]
     set_console_title(language);
-    
+
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 2 {
