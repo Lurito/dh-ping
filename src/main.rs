@@ -3,6 +3,7 @@ use std::net::UdpSocket;
 use std::time::Duration;
 use std::io::{self, Write};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
+use rustyline;
 
 #[cfg(target_os = "windows")]
 use winapi::um::winnls::GetUserDefaultUILanguage;
@@ -209,16 +210,18 @@ fn send_and_receive(destination: &str, language: &str) {
 
 fn repl_mode(language: &str) {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
+    let mut rl = rustyline::Editor::<(), rustyline::history::DefaultHistory>::new().unwrap();
 
+    // Set Ctrl + C/D handler
     ctrlc::set_handler(move || {
         let mut stdout = StandardStream::stdout(ColorChoice::Always);
         stdout.reset().unwrap();
         io::stdout().flush().unwrap();
         std::process::exit(0);
     }).unwrap_or_else(|_| { panic!("{}", match language {
-            "zh" => "初始化 SIGINT 信号处理逻辑失败，程序将退出。",
-            _ => "Failed to initialize SIGINT signal processing logic, the program will exit.",
-        }.to_string()) });
+        "zh" => "初始化 SIGINT 信号处理逻辑失败，程序将退出。",
+        _ => "Failed to initialize SIGINT signal processing logic, the program will exit.",
+    }.to_string()) });
 
     // Title hint
     print_version(language);
@@ -238,47 +241,55 @@ fn repl_mode(language: &str) {
     // Main logic
     loop {
         let prompt = "DH-Ping > ";
-        print!("{}", prompt);
         stdout.set_color(ColorSpec::new().set_fg(Some(Color::Yellow))).unwrap();
-        io::stdout().flush().unwrap();
-
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).unwrap();
-        let input = input.trim();
-
+        let readline = rl.readline(prompt);
         stdout.reset().unwrap();
-        io::stdout().flush().unwrap();
-
-        match input {
-            "exit" => {
-                std::process::exit(0);
-            },
-            // "help" => {
-            //     print_help(language);
-            //     continue;
-            // },
-            // "version" => {
-            //     print_version(language);
-            //     continue;
-            // },
-            _ => {
-                if !is_valid_ip_port(input) {
-                    stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red))).unwrap();
-                    io::stdout().flush().unwrap();
-
-                    match language {
-                        "zh" => eprintln!("错误: 无效的 IP:端口 格式。正确示例：127.0.0.1:7777"),
-                        _ => eprintln!("Error: Invalid IP:port format. Correct example: 127.0.0.1:7777"),
-                    }
-
-                    stdout.reset().unwrap();
-                    io::stdout().flush().unwrap();
-
+        
+        match readline {
+            Ok(line) => {
+                let input = line.trim();
+                if input.is_empty() {
                     continue;
                 }
 
-                send_and_receive(input, language);
-                println!();
+                // Add to history
+                let _ = rl.add_history_entry(input);
+                
+                match input {
+                    "exit" => {
+                        std::process::exit(0);
+                    },
+                    _ => {
+                        if !is_valid_ip_port(input) {
+                            stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red))).unwrap();
+                            io::stdout().flush().unwrap();
+
+                            match language {
+                                "zh" => eprintln!("错误: 无效的 IP:端口 格式。正确示例：127.0.0.1:7777"),
+                                _ => eprintln!("Error: Invalid IP:port format. Correct example: 127.0.0.1:7777"),
+                            }
+
+                            stdout.reset().unwrap();
+                            io::stdout().flush().unwrap();
+
+                            continue;
+                        }
+
+                        send_and_receive(input, language);
+                        println!();
+                    }
+                }
+            },
+            Err(rustyline::error::ReadlineError::Interrupted) => {
+                // Ctrl+C
+                std::process::exit(0);
+            },
+            Err(rustyline::error::ReadlineError::Eof) => {
+                // Ctrl+D
+                std::process::exit(0);
+            },
+            Err(_) => {
+                continue;
             }
         }
     }
