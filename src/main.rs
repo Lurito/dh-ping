@@ -76,15 +76,15 @@ fn print_help(language: &str) {
 
 fn print_version(language: &str) {
     let project_repo = built_info::PKG_REPOSITORY;
-    println!("Dread Hunger Ping Tool - v{} (2024-09-10)", built_info::PKG_VERSION);
+    println!("Dread Hunger Ping Tool - v{} (2025-08-27)", built_info::PKG_VERSION);
     match language {
         "zh" => {
-            println!("爱佐 (c) 2024，根据 GNU 宽通用公共许可证 (LGPL) 授权。");
-            println!("开源项目链接: {}", project_repo);
+            println!("爱佐 (c) 2024-2025，根据 GNU 宽通用公共许可证 (LGPL) 授权。");
+            println!("开源项目链接: {project_repo}");
         }
         _ => {
-            println!("Ayrzo (c) 2024. Licensed under the GNU Lesser General Public License.");
-            println!("Project Repository: {}", project_repo);
+            println!("Ayrzo (c) 2024-2025. Licensed under the GNU Lesser General Public License.");
+            println!("Project Repository: {project_repo}");
         }
     }
 }
@@ -121,10 +121,10 @@ fn send_and_receive(destination: &str, language: &str) {
         Err(e) => {
             stdout.set_color(ColorSpec::new().set_fg(Some(Color::Red))).unwrap();
             io::stdout().flush().unwrap();
-    
+
             match language {
-                "zh" => eprintln!("绑定 socket 失败: {}", e),
-                _ => eprintln!("Failed to bind socket: {}", e),
+                "zh" => eprintln!("绑定 socket 失败: {e}"),
+                _ => eprintln!("Failed to bind socket: {e}"),
             }
 
             stdout.reset().unwrap();
@@ -137,8 +137,8 @@ fn send_and_receive(destination: &str, language: &str) {
     match socket.send_to(&payload, destination) {
         Ok(_) => {
             match language {
-                "zh" => println!("数据已发往 {}", destination),
-                _ => println!("Data sent to {}", destination),
+                "zh" => println!("数据已发往 {destination}"),
+                _ => println!("Data sent to {destination}"),
             }
         }
         Err(e) => {
@@ -146,8 +146,8 @@ fn send_and_receive(destination: &str, language: &str) {
             io::stdout().flush().unwrap();
 
             match language {
-                "zh" => eprint!("数据发送失败: {}", e),
-                _ => eprint!("Failed to send data: {}", e),
+                "zh" => eprint!("数据发送失败: {e}"),
+                _ => eprint!("Failed to send data: {e}"),
             }
 
             stdout.reset().unwrap();
@@ -173,9 +173,9 @@ fn send_and_receive(destination: &str, language: &str) {
 
                 for (i, byte) in buffer.iter().take(size).enumerate() {
                     if i % 16 == 0 {
-                        print!("  {:08x}: ", i);
+                        print!("  {i:08x}: ");
                     }
-                    print!("{:02x}", byte);
+                    print!("{byte:02x}");
                     if i % 2 == 1 { // Add a space after every two bytes
                         print!(" ");
                     }
@@ -207,7 +207,7 @@ fn send_and_receive(destination: &str, language: &str) {
                 "zh" => print!("[未收到任何数据]"),
                 _ => print!("[No data received]"),
             }
-    
+
             stdout.reset().unwrap();
             io::stdout().flush().unwrap();
         }
@@ -225,7 +225,7 @@ fn repl_mode(language: &str) {
     impl Validator for InputHelper {}
     impl Highlighter for InputHelper {
         fn highlight<'l>(&self, line: &'l str, _pos: usize) -> std::borrow::Cow<'l, str> {
-            format!("\x1b[33m{}\x1b[0m", line).into()
+            format!("\x1b[33m{line}\x1b[0m").into()
         }
         fn highlight_char(&self, _line: &str, _pos: usize, _forced: bool) -> bool {
             true
@@ -268,7 +268,7 @@ fn repl_mode(language: &str) {
 
         stdout.reset().unwrap();
         io::stdout().flush().unwrap();
-        
+
         match readline {
             Ok(line) => {
                 let input = line.trim();
@@ -278,7 +278,7 @@ fn repl_mode(language: &str) {
 
                 // Add to history
                 let _ = rl.add_history_entry(input);
-                
+
                 match input {
                     "exit" => {
                         std::process::exit(0);
