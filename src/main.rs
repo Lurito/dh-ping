@@ -8,6 +8,9 @@ use rustyline;
 #[cfg(target_os = "windows")]
 use winapi::um::winnls::GetUserDefaultUILanguage;
 
+#[cfg(target_os = "windows")]
+use winapi::um::wincon::SetConsoleTitleA;
+
 pub mod built_info {
     include!(concat!(env!("OUT_DIR"), "/built.rs"));
 }
@@ -31,6 +34,27 @@ fn detect_language() -> &'static str {
         }
         "en"
     }
+}
+
+#[cfg(target_os = "windows")]
+fn set_console_title(language: &str) {
+    use std::ffi::CString;
+    
+    let title = match language {
+        "zh" => "DH-Ping - Dread Hunger 服务器连通性测试工具",
+        _ => "DH-Ping - Dread Hunger Server Connectivity Tool",
+    };
+    
+    if let Ok(c_title) = CString::new(title) {
+        unsafe {
+            SetConsoleTitleA(c_title.as_ptr());
+        }
+    }
+}
+
+#[cfg(not(target_os = "windows"))]
+fn set_console_title(_language: &str) {
+    // No-op on non-Windows platforms
 }
 
 fn print_help(language: &str) {
@@ -212,6 +236,9 @@ fn repl_mode(language: &str) {
     let mut stdout = StandardStream::stdout(ColorChoice::Always);
     let mut rl = rustyline::Editor::<(), rustyline::history::DefaultHistory>::new().unwrap();
     
+    // Set console title on Windows
+    set_console_title(language);
+    
     // 设置 Ctrl+C 处理
     ctrlc::set_handler(move || {
         let mut stdout = StandardStream::stdout(ColorChoice::Always);
@@ -299,6 +326,10 @@ fn repl_mode(language: &str) {
 
 fn main() {
     let language = detect_language();
+    
+    // Set console title on Windows
+    set_console_title(language);
+    
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 2 {

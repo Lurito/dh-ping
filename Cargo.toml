@@ -12,7 +12,7 @@ build = "build.rs"
 
 [dependencies]
 termcolor = "1.4"
-winapi = { version = "0.3", features = ["winuser", "winnls", "winnt"] }
+winapi = { version = "0.3", features = ["winuser", "winnls", "winnt", "wincon"] }
 ctrlc = "3.2"
 rustyline = "13.0"
 
